@@ -1,0 +1,28 @@
+package A_Pack;
+use Usage;
+
+%USAGE_ALIAS = (
+'BOOLEAN'=> ['ANYTHING',"Could be anything, but it's evaluated as a boolean."],
+'EXTRA_INT' => ['OPT(6)_INTEGER(>=,1)','An optional positive integer (defaulted to 6)'],
+);
+
+
+sub a_test {
+    setUsage('OPEN_HANDLE','INTEGER(>,1)','BOOLEAN','EXTRA_INT');&checkUsage;
+    local($handle,$int,$boolean,$extra_int) = @_;
+    print "The handle was passed as $handle\n";
+    if ($boolean) {
+	print "The boolean was true, and the extra integer was $extra_int\n";
+    } else {
+	print "The boolean was false, and the extra integer was $extra_int\n";
+    }
+    print $handle $int + $extra_int,"\n";
+}
+
+
+
+package main;
+open(H,">/tmp/temp.test");
+A_Pack::a_test(H,2,1,10);
+A_Pack::a_test(H,2,1);
+A_Pack::a_test(G,2);

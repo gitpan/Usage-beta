@@ -1,0 +1,79 @@
+alpha2:
+  Changed some incorrect documentation (mainly that the
+  argument being checked is the first argument to the
+  <test>_usage_test function, NOT the last.
+
+alpha3:
+  Changed the function names to be more compatible with
+  8 letter limits and autoload name clashes:
+    _usage_test         becomes _test_usage
+    _usage_display_string becomes _display_string_usage
+    _usage_quoted_args  becomes _quoted_args_usage
+    Type INTEGER becomes INT
+
+alpha4:
+   Fixed caller package support.
+   Added type ANY
+   Changed short name to add on LIST_OF_ for that prefix.
+   Changed display of error to not include package name of function
+
+beta1:
+  Naming is now stable.
+
+  Changed Test naming convention again! so that it supports
+  8 character function name truncation better. As it was, if
+  you want to support 8 character truncation, you need to 
+  keep the test names below 6 characters. I've changed
+  the names so that now it expects
+  t_TEST_test_usage               instead of TEST_test_usage
+  q_TEST_quoted_args_usage        instead of TEST_quoted_args_usage
+  d_TEST_display_string_usage     instead of TEST_display_string_usage
+
+  i.e, test functions have two characters prepended to
+  allow the function names to be unique for the different parts
+  of the test. Now tests cab be longer than 6 characters, they
+  should still be unique under truncation to six characters though
+  (if you think they may ever be used under DOS).
+--------------------
+  Added r_<test>_reference_arg_usage arg option to pass
+  [$index,\@_] instead of $_[$index]. (see OPEN_HANDLE
+  test for example of use)
+--------------------
+  Added tests INSTANCE, OBJECT, CLASS, OPEN_HANDLE (and supporting
+  functions), and changed INT back to INTEGER, ANY to ANYTHING
+--------------------
+  Changed the calling stack so that _setUsage and _checkUsage
+  are the ones which do the actual work - otherwise wrapping
+  functions mixed up the stack depth. Now _setUsage and _checkUsage
+  assume that they are called by ONE other function in Usage,
+  which is in turn called by the function that is being tested
+  in another package, that is in turn called from somewhere.
+
+  i.e. the stack is always (from _setUsage and _checkUsage perspective)
+
+  any function calling 'function'                 ((caller(3))[3])
+  'function' calling 'Usage wrapper'              ((caller(2))[3])
+  'Usage wrapper' calling _{set/check}Usage       ((caller(1))[3])
+  _setUsage and _checkUsage                       ((caller(0))[3])
+
+  This provides a consistent stack height for error messages.
+--------------------
+  renamed some private functions so that they were unique under
+  8-character truncation.
+--------------------
+  Fixed error messages to be accurate about where the error occurred,
+  including giving stack trace.
+--------------------
+  Added aliasing of tests
+--------------------
+
+beta2:
+  Bug where INSTANCE, CLASS and OBJECT don't check for the given
+  class, only superclasses!, is fixed - added function
+   sub _classType {
+      my($class,$ancestor) = @_;
+      ($class eq $ancestor) || _has_superclass($class,$ancestor);
+   }
+
+  And changed all calls from _has_superclass to calls to _classType
+  in INSTANCE, CLASS and OBJECT test functions.
